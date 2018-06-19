@@ -19,7 +19,3 @@ workflows:
   build_and_deploy:
     jobs:
       - deploy-helm-charts
-
-test:
-  override:
-    - echo "test"
