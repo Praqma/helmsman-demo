@@ -13,7 +13,7 @@ storageBackend = "secret" # default is configMap
   protected = true
   [namespaces.development]
    protected = false
-  [namespace = kube-system]
+  [namespaces.kube-system]
    installTiller = false
 
 [helmRepos]
