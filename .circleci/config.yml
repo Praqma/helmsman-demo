@@ -9,13 +9,13 @@ jobs:
       - run: 
           name: make .kube directory
           command: mkdir ~/.kube
-      - run: ls -la ~/.kube/
-      - run: 
-          name: run kubectl get nodes to verify we can talk to the cluster
-          command: kubectl get nodes
       - run: 
           name: setup .kube/config file using env variable
           command: echo $KUBECTL_CONFIG | base64 -d > ~/.kube/config
+      - run: ls -la ~/.kube
+      - run: 
+          name: run kubectl get nodes to verify we can talk to the cluster
+          command: kubectl get nodes
       - run: 
           name: deploy helm charts using helmsman
           command: helmsman -debug -apply -f helmsman-deployments.toml
