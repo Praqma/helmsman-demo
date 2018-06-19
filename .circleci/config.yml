@@ -2,7 +2,8 @@ version: 2
 jobs:
   deploy-helm-charts:
     docker:
-      - image: praqma/helmsman:v1.3.0-rc
+      # - image: praqma/helmsman:v1.3.0-rc
+      - image: praqma/helmsman:v1.2.0
     steps:
       - checkout
       - run: 
