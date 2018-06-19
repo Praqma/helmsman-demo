@@ -1,0 +1,17 @@
+version: 2
+jobs:
+  deploy-helm-charts:
+    docker:
+      - image: praqma/helmsman:v1.3.0-rc
+    steps:
+      - checkout
+      - run:
+        name: Deploy Helm charts/packages using Helmsman
+        command: helmsman -debug -apply -f helmsman-deployments.toml
+
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - deploy-helm-charts
