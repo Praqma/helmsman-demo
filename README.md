@@ -73,7 +73,7 @@ Server: &version.Version{SemVer:"v2.7.2", GitCommit:"8478fb4fc723885b155c924d1c8
 
 **Note:** If you do not do `helm init`, you will get the following error when you try to do anything useful with helm:
 ```
-[kamran@kworkhorse applications]$ helm repo list
+[kamran@kworkhorse helmsman-demo]$ helm repo list
 Error: open /home/kamran/.helm/repository/repositories.yaml: no such file or directory
 ```
 
@@ -164,52 +164,69 @@ Tiller (the Helm server-side component) has been uninstalled from your Kubernete
 First, make sure you have some repositories on your local computer. (You get them after `helm init` step above).
 
 ```
-[kamran@kworkhorse applications]$ helm repo list
+[kamran@kworkhorse helmsman-demo]$ helm repo list
 NAME  	URL                                             
 stable	https://kubernetes-charts.storage.googleapis.com
 local 	http://127.0.0.1:8879/charts                    
-[kamran@kworkhorse applications]$ 
+[kamran@kworkhorse helmsman-demo]$ 
 ```
 
 
-# Installing a chart (package):
+
+## Search for a chart:
+```
+[kamran@kworkhorse helmsman-demo]$ helm search mysql
+NAME                         	VERSION	DESCRIPTION                                       
+stable/mysql                 	0.3.7  	Fast, reliable, scalable, and easy to use open-...
+stable/percona               	0.3.1  	free, fully compatible, enhanced, open source d...
+stable/percona-xtradb-cluster	0.1.4  	free, fully compatible, enhanced, open source d...
+stable/gcloud-sqlproxy       	0.3.2  	Google Cloud SQL Proxy                            
+stable/mariadb               	3.0.3  	Fast, reliable, scalable, and easy to use open-...
+[kamran@kworkhorse helmsman-demo]$	
+```
+
+
+
+## Installing a chart (package):
+
+`helm install` will deploy/install a helm chart as a **release** . 
 
 ```
-[kamran@kworkhorse applications]$ helm install stable/mysql
-NAME:   snug-beetle
-LAST DEPLOYED: Mon Dec 11 11:10:48 2017
+[kamran@kworkhorse helmsman-demo]$ helm install --name mysql --namespace=default stable/mysql
+NAME:   mysql
+LAST DEPLOYED: Tue Jun 19 21:58:55 2018
 NAMESPACE: default
 STATUS: DEPLOYED
 
 RESOURCES:
 ==> v1/Secret
-NAME               TYPE    DATA  AGE
-snug-beetle-mysql  Opaque  2     1s
+NAME         TYPE    DATA  AGE
+mysql-mysql  Opaque  2     0s
 
 ==> v1/PersistentVolumeClaim
-NAME               STATUS  VOLUME                                    CAPACITY  ACCESS MODES  STORAGECLASS  AGE
-snug-beetle-mysql  Bound   pvc-8f58a324-de5b-11e7-8a7e-02412acf5adc  8Gi       RWO           gp2           1s
+NAME         STATUS   VOLUME    CAPACITY  ACCESS MODES  STORAGECLASS  AGE
+mysql-mysql  Pending  standard  0s
 
 ==> v1/Service
-NAME               TYPE       CLUSTER-IP      EXTERNAL-IP  PORT(S)   AGE
-snug-beetle-mysql  ClusterIP  100.64.124.209  <none>       3306/TCP  1s
+NAME         TYPE       CLUSTER-IP   EXTERNAL-IP  PORT(S)   AGE
+mysql-mysql  ClusterIP  10.15.243.9  <none>       3306/TCP  0s
 
 ==> v1beta1/Deployment
-NAME               DESIRED  CURRENT  UP-TO-DATE  AVAILABLE  AGE
-snug-beetle-mysql  1        1        1           0          1s
+NAME         DESIRED  CURRENT  UP-TO-DATE  AVAILABLE  AGE
+mysql-mysql  1        1        1           0          0s
 
 ==> v1/Pod(related)
-NAME                                READY  STATUS   RESTARTS  AGE
-snug-beetle-mysql-1228755901-nkthh  0/1    Pending  0         1s
+NAME                          READY  STATUS   RESTARTS  AGE
+mysql-mysql-7768bff7c8-t9nzf  0/1    Pending  0         0s
 
 
 NOTES:
 MySQL can be accessed via port 3306 on the following DNS name from within your cluster:
-snug-beetle-mysql.default.svc.cluster.local
+mysql-mysql.default.svc.cluster.local
 
 To get your root password run:
 
-    kubectl get secret --namespace default snug-beetle-mysql -o jsonpath="{.data.mysql-root-password}" | base64 --decode; echo
+    MYSQL_ROOT_PASSWORD=$(kubectl get secret --namespace default mysql-mysql -o jsonpath="{.data.mysql-root-password}" | base64 --decode; echo)
 
 To connect to your database:
 
@@ -222,46 +239,124 @@ To connect to your database:
     $ apt-get update && apt-get install mysql-client -y
 
 3. Connect using the mysql cli, then provide your password:
-    $ mysql -h snug-beetle-mysql -p
+    $ mysql -h mysql-mysql -p
 
-[kamran@kworkhorse applications]$ 
+To connect to your database directly from outside the K8s cluster:
+    MYSQL_HOST=127.0.0.1
+    MYSQL_PORT=3306
+
+    # Execute the following commands to route the connection:
+    export POD_NAME=$(kubectl get pods --namespace default -l "app=mysql-mysql" -o jsonpath="{.items[0].metadata.name}")
+    kubectl port-forward $POD_NAME 3306:3306
+
+    mysql -h ${MYSQL_HOST} -P${MYSQL_PORT} -u root -p${MYSQL_ROOT_PASSWORD}
+    
+
+[kamran@kworkhorse helmsman-demo]$ 
 ```
 
+Note: If you do not specify a **name**, the names of the installed helm chart (the release) and the resulting deployment will be auto-generated.
 
 
-# List installed charts / packages:
+## List installed charts (releases) and related kubernetes objects:
 ```
-[kamran@kworkhorse applications]$ helm ls
-NAME      	REVISION	UPDATED                 	STATUS  	CHART           	NAMESPACE  
-traefik   	20      	Wed Dec  6 15:50:25 2017	DEPLOYED	traefik-1.14.2  	kube-system
-snug-beetle	1       	Mon Dec 11 11:10:48 2017	DEPLOYED	mysql-0.3.0     	default    
-[kamran@kworkhorse applications]$ 
-```
-Notice mysql is deployed with the name `snug-beetle` ! (I don't know why! :( )
-
-# Delete a deployment:
-```
-[kamran@kworkhorse applications]$ helm delete confluence
-release "confluence" deleted
-[kamran@kworkhorse applications]$
+[kamran@kworkhorse helmsman-demo]$ helm list
+NAME 	REVISION	UPDATED                 	STATUS  	CHART      	NAMESPACE
+mysql	1       	Tue Jun 19 21:58:55 2018	DEPLOYED	mysql-0.3.7	default  
+[kamran@kworkhorse helmsman-demo]$ 
 ```
 
-Deleting a chart/package also releases it's volumes (PVC). But if you `rollback` , you will get it back and the pvc volumes will be mounted again.
-
-# Rollback a deletion operation:
 ```
-[kamran@kworkhorse code-as-code]$ helm rollback confluence 7
+[kamran@kworkhorse helmsman-demo]$ kubectl get deployments
+NAME          DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+multitool     1         1         1            1           1d
+mysql-mysql   1         1         1            1           10m
+
+
+[kamran@kworkhorse helmsman-demo]$ kubectl get pods
+NAME                           READY     STATUS    RESTARTS   AGE
+multitool-74f649f9cb-68hkf     1/1       Running   0          1d
+mysql-mysql-7768bff7c8-t9nzf   1/1       Running   0          10m
+
+
+[kamran@kworkhorse helmsman-demo]$ kubectl get services
+NAME          TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)    AGE
+kubernetes    ClusterIP   10.15.240.1   <none>        443/TCP    1d
+mysql-mysql   ClusterIP   10.15.243.9   <none>        3306/TCP   10m
+[kamran@kworkhorse helmsman-demo]$ 
+```
+
+```
+[kamran@kworkhorse helmsman-demo]$ kubectl get pvc
+NAME          STATUS    VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+mysql-mysql   Bound     pvc-32dfe3af-73fb-11e8-a57a-42010aa6000b   8Gi        RWO            standard       13m
+
+
+[kamran@kworkhorse helmsman-demo]$ kubectl get pv
+NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS    CLAIM                 STORAGECLASS   REASON    AGE
+pvc-32dfe3af-73fb-11e8-a57a-42010aa6000b   8Gi        RWO            Delete           Bound     default/mysql-mysql   standard                 12m
+[kamran@kworkhorse helmsman-demo]$
+```
+
+```
+[kamran@kworkhorse helmsman-demo]$ kubectl get secrets
+NAME                  TYPE                                  DATA      AGE
+default-token-kqnjc   kubernetes.io/service-account-token   3         1d
+mysql-mysql           Opaque                                2         11m
+
+
+[kamran@kworkhorse helmsman-demo]$ kubectl get configmaps
+No resources found.
+[kamran@kworkhorse helmsman-demo]$ 
+```
+
+## Verify that you can use the deployed chart:
+
+We need to connect to the mysql service from within the cluster. For that we already have a multitool running inside the cluster, which has mysql client installed in it. We also need the MYSQL_ROOT_PASSWORD for the current deployment.
+
+```
+[kamran@kworkhorse helmsman-demo]$ MYSQL_ROOT_PASSWORD=$(kubectl get secret --namespace default mysql-mysql -o jsonpath="{.data.mysql-root-password}" | base64 --decode; echo)
+[kamran@kworkhorse helmsman-demo]$ echo $MYSQL_ROOT_PASSWORD 
+UUoATlBI3Q
+[kamran@kworkhorse helmsman-demo]$
+```
+
+Connect to the multitool and from there use mysql client to connect to the freshly-setup mysql service:
+```
+[kamran@kworkhorse helmsman-demo]$ kubectl exec -it multitool-74f649f9cb-68hkf bash
+
+[root@multitool-74f649f9cb-68hkf /]# mysql -u root -h mysql-mysql.default.svc.cluster.local -p
+Enter password: 
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MySQL connection id is 226
+Server version: 5.7.14 MySQL Community Server (GPL)
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MySQL [(none)]> 
+```
+
+Hurray!
+
+
+## Delete a helm release:
+```
+[kamran@kworkhorse helmsman-demo]$ helm delete mysql
+release "mysql" deleted
+[kamran@kworkhorse helmsman-demo]$
+```
+
+Deleting a release also releases it's volumes (PVC). But if you `rollback` , you will get it back and the pvc volumes will be mounted again.
+
+
+## Rollback a deletion operation:
+```
+[kamran@kworkhorse helmsman-demo]$ helm rollback mysql 1
 Rollback was a success! Happy Helming!
-[kamran@kworkhorse code-as-code]$
+[kamran@kworkhorse helmsman-demo]$
 ```
 
-
-## Verify that confluence PVC  is obtained and bound:
-```
-[kamran@kworkhorse code-as-code]$ kubectl get pvc
-NAME                                         STATUS    VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
-snug-beetle-mysql                            Bound     pvc-8f58a324-de5b-11e7-8a7e-02412acf5adc   8Gi        RWO            gp2            3m
-[kamran@kworkhorse code-as-code]$ 
-```
 
 
