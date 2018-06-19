@@ -25,7 +25,7 @@ incubator = "http://storage.googleapis.com/kubernetes-charts-incubator"
     enabled = true # change to false if you want to delete this app release [empty = false]
     chart = "stable/mysql" # changing the chart name means delete and recreate this chart
     version = "0.3.7" # chart version
-    valuesFile = "applications/development/mysql-development.values" # leaving it empty uses the default chart values
+    valuesFile = "applications/development/mysql-development-values.yaml" # leaving it empty uses the default chart values
     purge = false # will only be considered when there is a delete operation
     test = false # run the tests when this release is installed for the first time only
     protected = false
