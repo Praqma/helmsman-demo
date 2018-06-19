@@ -18,7 +18,7 @@ stable = "https://kubernetes-charts.storage.googleapis.com"
 incubator = "http://storage.googleapis.com/kubernetes-charts-incubator"
 
 [apps]
-    [apps.]
+    [apps.mysql]
     name = "mysql" # should be unique across all apps
     description = "mysql"
     namespace = "development" # maps to the namespace as defined in namespaces above
