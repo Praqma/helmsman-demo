@@ -5,8 +5,15 @@ jobs:
       - image: praqma/helmsman:v1.3.0-rc
     steps:
       - checkout
-      - run: "mkdir ~/.kube ; echo $KUBECTL_CONFIG | base64 -d > ~/.kube/config"
-      - run: "helmsman -debug -apply -f helmsman-deployments.toml"
+      - run: 
+        name: make .kube directory
+        command: mkdir ~/.kube
+      - run: 
+        name: setup .kube/config file using env variable
+        command: echo $KUBECTL_CONFIG | base64 -d > ~/.kube/config
+      - run: 
+        name: deploy helm charts using helmsman
+        command: helmsman -debug -apply -f helmsman-deployments.toml
 workflows:
   version: 2
   build_and_deploy:
