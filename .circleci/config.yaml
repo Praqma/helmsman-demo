@@ -5,16 +5,10 @@ jobs:
       - image: praqma/helmsman:v1.3.0-rc
     steps:
       - checkout
-      - run:
-        name: Setup Kubernetes config file from the ENV var
-        command: mkdir ~/.kube ; echo $KUBECTL_CONFIG | base64 -d > ~/.kube/config
-      - run:
-        name: Deploy Helm charts/packages using Helmsman
-        command: helmsman -debug -apply -f helmsman-deployments.toml
-
-
+      - run: "mkdir ~/.kube ; echo $KUBECTL_CONFIG | base64 -d > ~/.kube/config"
+      - run: "helmsman -debug -apply -f helmsman-deployments.toml"
 workflows:
   version: 2
-  build:
+  build_and_deploy:
     jobs:
       - deploy-helm-charts
