@@ -193,10 +193,6 @@ To connect to your database:
 ```
 [kamran@kworkhorse applications]$ helm ls
 NAME      	REVISION	UPDATED                 	STATUS  	CHART           	NAMESPACE  
-bitbucket 	7       	Wed Dec  6 15:47:19 2017	DEPLOYED	bitbucket-0.1.3 	default    
-confluence	7       	Wed Dec  6 15:47:16 2017	DEPLOYED	confluence-0.1.3	default    
-jenkins   	9       	Wed Dec  6 15:47:25 2017	DEPLOYED	jenkins-0.9.0   	staging    
-jira      	8       	Fri Dec  8 13:49:47 2017	DEPLOYED	jira-0.1.8      	default    
 traefik   	20      	Wed Dec  6 15:50:25 2017	DEPLOYED	traefik-1.14.2  	kube-system
 snug-beetle	1       	Mon Dec 11 11:10:48 2017	DEPLOYED	mysql-0.3.0     	default    
 [kamran@kworkhorse applications]$ 
@@ -224,9 +220,6 @@ Rollback was a success! Happy Helming!
 ```
 [kamran@kworkhorse code-as-code]$ kubectl get pvc
 NAME                                         STATUS    VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
-bitbucket-persistent-storage-bitbucket-0     Bound     pvc-c824c7e1-da6f-11e7-8a7e-02412acf5adc   50Gi       RWO            gp2            4d
-confluence-persistent-storage-confluence-0   Bound     pvc-09248c9f-de56-11e7-8a7e-02412acf5adc   50Gi       RWO            gp2            42m
-jira-persistent-storage-jira-0               Bound     pvc-46359504-dc16-11e7-8a7e-02412acf5adc   50Gi       RWO            gp2            2d
 snug-beetle-mysql                            Bound     pvc-8f58a324-de5b-11e7-8a7e-02412acf5adc   8Gi        RWO            gp2            3m
 [kamran@kworkhorse code-as-code]$ 
 ```
