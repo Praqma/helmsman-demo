@@ -13,6 +13,9 @@ storageBackend = "secret" # default is configMap
   protected = true
   [namespaces.development]
    protected = false
+  [namespace = kube-system]
+   installTiller = false
+
 [helmRepos]
 stable = "https://kubernetes-charts.storage.googleapis.com"
 incubator = "http://storage.googleapis.com/kubernetes-charts-incubator"
