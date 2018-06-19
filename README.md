@@ -114,7 +114,47 @@ Note: The **cluster-admin** role is created by default in a Kubernetes cluster, 
 
 Now, use `kubectl create -f <yaml-file>` to create these two objects:
 
-( TODO to do todo)
+```
+[kamran@kworkhorse helmsman-demo]$ kubectl create -f rbac-config.yaml 
+serviceaccount "tiller" created
+clusterrolebinding "tiller" created
+[kamran@kworkhorse helmsman-demo]$ 
+```
+
+Now do a helm init specifying the service account used for tiller:
+```
+[kamran@kworkhorse helmsman-demo]$ helm init --upgrade --service-account tiller
+$HELM_HOME has been configured at /home/kamran/.helm.
+
+Tiller (the Helm server-side component) has been upgraded to the current version.
+Happy Helming!
+[kamran@kworkhorse helmsman-demo]$
+```
+
+You should be able to get a list of repositories now:
+```
+[kamran@kworkhorse helmsman-demo]$ helm repo list
+NAME   	URL                                             
+stable 	https://kubernetes-charts.storage.googleapis.com
+local  	http://127.0.0.1:8879/charts                    
+[kamran@kworkhorse helmsman-demo]$ 
+```
+
+
+**Note:** If you are working on kubernetes as a service through some  cloud provider, such as GKE, then you will need correct permissions for the account you are using to access the kubernetes cluster - to be able to setup correct RBAC policies/bindings, otherwise you may see errors like the following:
+```
+[kamran@kworkhorse helmsman-demo]$ kubectl create -f rbac-config.yaml 
+serviceaccount "tiller" created
+Error from server (Forbidden): error when creating "rbac-config.yaml": clusterrolebindings.rbac.authorization.k8s.io is forbidden: User "someuser@mycompany.iam.gserviceaccount.com" cannot create clusterrolebindings.rbac.authorization.k8s.io at the cluster scope: Required "container.clusterRoleBindings.create" permission.
+[kamran@kworkhorse helmsman-demo]$ 
+```
+
+**Note:** If you make any mistake in installing tiller, you can always uninstall it and install it again.
+```
+[kamran@kworkhorse helmsman-demo]$ helm reset
+Tiller (the Helm server-side component) has been uninstalled from your Kubernetes Cluster.
+[kamran@kworkhorse helmsman-demo]$ 
+```
 
 
  
