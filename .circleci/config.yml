@@ -9,6 +9,7 @@ jobs:
       - run: 
           name: make .kube directory
           command: mkdir ~/.kube
+      - run: ls -la ~/.kube/
       - run: 
           name: run kubectl get nodes to verify we can talk to the cluster
           command: kubectl get nodes
