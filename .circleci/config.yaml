@@ -6,6 +6,9 @@ jobs:
     steps:
       - checkout
       - run:
+        name: Setup Kubernetes config file from the ENV var
+        command: mkdir ~/.kube ; echo $KUBECTL_CONFIG | base64 -d > ~/.kube/config
+      - run:
         name: Deploy Helm charts/packages using Helmsman
         command: helmsman -debug -apply -f helmsman-deployments.toml
 
