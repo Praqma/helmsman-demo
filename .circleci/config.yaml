@@ -6,14 +6,14 @@ jobs:
     steps:
       - checkout
       - run: 
-        name: make .kube directory
-        command: mkdir ~/.kube
+          name: make .kube directory
+          command: mkdir ~/.kube
       - run: 
-        name: setup .kube/config file using env variable
-        command: echo $KUBECTL_CONFIG | base64 -d > ~/.kube/config
+          name: setup .kube/config file using env variable
+          command: echo $KUBECTL_CONFIG | base64 -d > ~/.kube/config
       - run: 
-        name: deploy helm charts using helmsman
-        command: helmsman -debug -apply -f helmsman-deployments.toml
+          name: deploy helm charts using helmsman
+          command: helmsman -debug -apply -f helmsman-deployments.toml
 workflows:
   version: 2
   build_and_deploy:
