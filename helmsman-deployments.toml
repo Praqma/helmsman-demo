@@ -6,6 +6,7 @@ description = "example Desired State File for demo purposes."
 
 [settings]
 kubeContext = "gke_praqma-education_europe-north1-a_helm-demo-telenor" # will try connect to this context first, if it does not exist, it will be created using the details below
+serviceAccount = "tiller" # k8s serviceaccount must be already defined, validation error will be thrown otherwise
 storageBackend = "secret" # default is configMap
 
 [namespaces]
@@ -15,6 +16,7 @@ storageBackend = "secret" # default is configMap
    protected = false
   [namespaces.kube-system]
    installTiller = false
+   tillerServiceAccount = "tiller" 
 
 [helmRepos]
 stable = "https://kubernetes-charts.storage.googleapis.com"
