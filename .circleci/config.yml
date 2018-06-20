@@ -4,19 +4,15 @@ jobs:
     docker:
       # - image: praqma/helmsman:v1.3.0-rc
       - image: praqma/helmsman:v1.2.0
+      - image: kamranazeem/helmsman-fedora
     steps:
-      - checkout
-      - run: 
-          name: make .kube directory
-          command: mkdir ~/.kube
-      - run: 
-          name: setup .kube/config file using env variable
-          command: echo $KUBECTL_CONFIG | base64 -d > ~/.kube/config
+      # I will setup .kube/config using gcloud, before doing the checkout of the main demo repo.
+      - run: echo ${GCLOUD_AUTH_FILE_JSON_BASE64} | base64 -d > ${HOME}/gcloud-auth-file.json
+      - run: /google-cloud-sdk/bin/gcloud auth activate-service-account --key-file=${HOME}/gcloud-auth-file.json
+      - run: /google-cloud-sdk/bin/gcloud container clusters get-credentials ${GKE_CLUSTER_NAME} --zone ${GKE_CLUSTER_ZONE} --project ${GKE_CLUSTER_PROJECT_NAME}
       - run: ls -la ~/.kube
-      - run: kubectl config get-contexts
-      - run: 
-          name: run kubectl get nodes to verify we can talk to the cluster
-          command: kubectl get nodes
+      - run: kubectl get nodes,pods
+      - checkout
       - run: 
           name: deploy helm charts using helmsman
           command: helmsman -debug -apply -f helmsman-deployments.toml
