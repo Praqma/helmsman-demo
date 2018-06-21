@@ -11,7 +11,7 @@ storageBackend = "secret" # default is configMap
 
 [namespaces]
   [namespaces.production]
-  protected = true
+   protected = true
   [namespaces.development]
    protected = false
   [namespaces.kube-system]
@@ -33,7 +33,7 @@ incubator = "http://storage.googleapis.com/kubernetes-charts-incubator"
     valuesFile = "applications/development/mysql-development-values.yaml" # leaving it empty uses the default chart values
     purge = false # will only be considered when there is a delete operation
     test = false # run the tests when this release is installed for the first time only
-    protected = false
+    protected = true
     priority= -3
     wait = true
 
