@@ -124,7 +124,7 @@ description = "example Desired State File for demo purposes."
 [certificates]
 
 [settings]
-kubeContext = "gke_praqma-education_europe-north1-a_helm-demo-telenor" # will try connect to this context first, if it does not exist, it will be created using the details below
+kubeContext = "gke_praqma-education_europe-north1-a_helm-demo-acme" # will try connect to this context first, if it does not exist, it will be created using the details below
 storageBackend = "secret" # default is configMap
 
 [namespaces]

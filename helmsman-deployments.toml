@@ -5,22 +5,37 @@ description = "example Desired State File for demo purposes."
 [certificates]
 
 [settings]
-kubeContext = "gke_praqma-education_europe-north1-a_helm-demo-telenor" # will try connect to this context first, if it does not exist, it will be created using the details below
-serviceAccount = "tiller" # k8s serviceaccount must be already defined, validation error will be thrown otherwise
-storageBackend = "secret" # default is configMap
+
+# Helmsman will try connect to this context first, if it does not exist, it will be created using the credentials provided further below
+kubeContext = "gke_praqma-education_europe-west1-b_acme-workshop" 
+
+# Find your current-context using:
+# [kamran@kworkhorse ~]$ kubectl config current-context
+# gke_praqma-education_europe-west1-b_acme-workshop
+# [kamran@kworkhorse ~]$ 
+
+serviceAccount = "tiller" # k8s serviceaccount for helm's tiller - must be already defined; validation error will be thrown otherwise.
+
+# helm has option of using "secret" or "configmap" as a method of storaging it's state. 
+# You don't need to actually create any "secret" per se.
+# The default backend is "configMap".
+storageBackend = "secret"
 
 [namespaces]
   [namespaces.production]
-   protected = false
+   protected = true
   [namespaces.development]
    protected = false
   [namespaces.kube-system]
+   protected = true
+   # Kube-system normally has tiller installed - almost always. So no need to do this here.
    installTiller = false
    tillerServiceAccount = "tiller" 
 
 [helmRepos]
 stable = "https://kubernetes-charts.storage.googleapis.com"
-incubator = "http://storage.googleapis.com/kubernetes-charts-incubator"
+# More bleeding edge repo:
+# incubator = "http://storage.googleapis.com/kubernetes-charts-incubator"
 
 [apps]
     [apps.mysql]
